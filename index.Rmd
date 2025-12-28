@@ -1,0 +1,510 @@
+---
+title: "Análisis predictivo del éxito estudiantil NNA"
+author: "Claudio Guevara & Santiago Moscoso"
+date: "2025-11-25"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Autor: Claudio Guevara [cguevarav\@ucacue.edu.ec](mailto:cguevarav@ucacue.edu.ec){.email}
+
+## Autor: Santiago Moscoso [smoscosob\@ucacue.edu.ec](mailto:smoscosob@ucacue.edu.ec){.email}
+
+### Universidad Católica de Cuenca, Universidad Nacional de Cuyo
+
+### Universidad Católica de Cuenca, Universidad Nacional de Cuyo
+
+### Disponible <https://rpubs.com/claudioguevara/analisispredictivoestudiantil>
+
+# Análisis predictivo del éxito estudiantil basado en la interacción con recursos digitales: Un enfoque con redes neuronales artificiales
+
+## Situación problema
+
+La adopción de entornos virtuales de aprendizaje en la educación y sistemas de gestión de aprendizaje a partir de una pandemia en el mundo entero ha generado un impacto positivo, Debido a que estos sistemas permiten la disponibilidad de datos educativos generados por la interacción de los estudiantes y docentes dentro de los (LMS), a estos datos se los conoce como huellas de aprendizaje o clickstreams. Esto permite que mediante la minería de datos educativos y la analítica del aprendizaje se pueda detectar tempranamente a los estudiantes que se encuentren en riesgo de deserción o de fracaso académico para facilitar intervenciones oportunas.
+
+Tradicionalmente métodos basados en minería de datos educativos abordan estas situaciones problemáticas mediante técnicas de aprendizaje automático clásico, la regresión logística, vectores de soporte y bosques aleatorios. Sin embargo, estos enfoques presentan limitaciones significativas porque dependen en gran medida de una ingeniería de características manual que resulta compleja y difícil de escalar, además ignoran la temporalidad y secuencia de las interacciones que tienen los estudiantes en la plataforma. Para superar estas barreras, este artículo adopta un enfoque basado en Redes Neuronales Artificiales (ANN) y aprendizaje profundo (Deep learning), tecnologías que han demostrado una capacidad superior para modelar patrones no lineales y dependencias a largo plazo en datos secuenciales. A diferencia de los modelos tradicionales, arquitecturas avanzadas como las Redes de Memoria a Corto y Largo Plazo (LSTM) Y redes neuronales pueden procesar automáticamente los registros de actividad sin una extensa intervención humana, capturando la dinámica evolutiva del compromiso estudiantil a lo largo de la asignatura.
+
+A esto se suma, la oportunidad de asignar pesos diferenciados a las interacciones más relevantes que permiten mejorar la precisión predictiva como la capacidad de interpretar qué comportamientos específicos que pueden ir desde la participación de un foro, la entrega de tareas, hasta la interacción en los cuestionarios, son elementos determinantes para definir el éxito académico.
+
+La insuficiencia de métodos de estadísticos y de aprendizaje automático tradicional es una problemática que se encuentra al momento de analizar los datos académicos, debido a que los enfoques existentes dependen de análisis estadístico simples o modelos de aprendizaje automáticos como regresión logística o árboles de decisión que no logran escalar adecuadamente ante la complejidad que puede existir en los datos que se producen en un LMS.
+
+En este contexto, esta investigación se centra en el análisis predictivo del éxito estudiantil mediante la fusión de información multidimensional (demográfica, académica y de interacción digital) procesada a través de redes neuronales. el objetivo es trascender una clasificación binaria de aprobado o reprobado de una asignatura, hacia una comprensión más granular y dinámica del rendimiento estudiantil coma permitiendo a los actores del sistema educativo implementar estrategias de apoyo personalizadas y proactivas basadas en evidencia que puede estar oculta en los datos de interacción digital que se produce en estos LMS.
+
+## Métodos
+
+Se realizó un estudio cuantitativo con enfoque predictivo, utilizando analítica de aprendizaje basada en trazas digitales (logs) de interacción en el entorno virtual de aprendizaje. El objetivo fue predecir el éxito académico del estudiante considerando para este estudio el éxito académico a la aprobación de la asignatura por parte de los estudiantes, A partir de su comportamiento en la plataforma LMS analizando la interacción con recursos digitales y de aprendizaje en las etapas tempranas de la asignatura.
+
+Se utilizaron los datos de Open University Learning Analytics Dataset (OULAD). A partir de los registros de interacción del VLE (archivo csv studentVle) Se filtraron las interacciones correspondientes a los primeros 90 días desde el inicio de la asignatura (día 0 a día 89). Posteriormente, los eventos se agregaron por estudiante y por tipo de actividad (activity_type) empleando una suma de clics (sum_click). El conjunto final se estructuró con una fila por estudiante y columnas que representan el volumen de interacción por tipo de recurso.
+
+La variable dependiente correspondió al éxito académico, operacionalizando como una variable binaria asignando al valor de 1 si el estudiante aprobó la asignatura (categorías Pass/Distinction) y 0 en caso contrario ( File/Withdraw), obtenida desde el archivo csv studentInfo.
+
+Para garantizar la comparabilidad entre variables los atributos de interacción fueron normalizados mediante escalamiento min-max, utilizando como referencia únicamente los parámetros calculados en el conjunto de entrenamiento. Se eliminaron los registros con valores faltantes (NA). El conjunto de datos se dividió en entrenamiento un 80% y prueba un 20% con el fin de conservar la proporción de clases en ambos subconjuntos .
+
+Se implementó finalmente una red neuronal artificial tipo perceptrón multicapa para clasificación binaria utilizando el paquete nnet en RStudio. La arquitectura consistió en una capa de entrada con p variables que correspondía a las interacciones por el tipo de recurso educativo de la plataforma LMS, una capa oculta con 15 neuronas (size =15) y una capa de salida con dos nudos correspondientes a las asignaturas [0,1]. El entrenamiento se realizó por optimización iterativa donde se fueron ajustando los pesos mediante retropropagación con un máximo de 400 de iteraciones (maxit=400).
+
+## Materiales
+
+Se utilizaron como materiales un entorno de desarrollo de RStudio para el procesamiento y análisis de datos el dataset utilizado es de Open University Learning Analytics Dataset (OULAD) Como fuente de información principal. El dataset aportó registros de interacción en el entorno virtual de aprendizaje denominados “logs de clics” y resultados académicos finales, integrados mediante los archivos en formato csv studentVle, vle y studentInfo. para la preparación de datos se emplearon paquetes de R orientados a manipulación y lectura eficiente de grandes volúmenes (data.table) y funciones de partición y evaluación de modelos (caret). el modelo predictivo se implementó mediante redes neuronales artificiales con el paquete (nnet), y la interpretación/visualización del modelo y la importancia relativa de variables (KPI) se realizó con (NeuralNetTools), complementando con herramientas de visualización como (ggplot2).
+
+Tabla 1. Exploración de la tabla a utilizar
+
+![](Tabla%201_Visualización%20de%20Datos.jpeg){width="716"}
+
+## Desarrollo del modelo
+
+La Figura 1 muestra la arquitectura de la red neuronal empleada para la clasificación del éxito académico.
+
+![Figura 1. Arquitectura de la Red Neuronal](F1_Arqui_RedNeuronal.jpeg){width="690"}
+
+El modelo recibe como entradas 19 variables de interacción en el LMS que son tipos de actividades con las que el estudiante ha interactuado, las cuales se conectan a una capa oculta de 15 neuronas (size = 15). Las conexiones representan los pesos aprendidos durante el entrenamiento , donde las líneas de mayor grosor reflejan la mayor magnitud del peso. La capa de salida está compueta por dos nodos que corresponden a las clases "no aprueba" (valor = 0) y "aprueba la asignatura" (valor = 1). Estas calculadas mediante una función "Softmax". La densidad de conexiones y presencia de pesos de distinta magnitud sugieren que la predicción depende de la combiación de múltiples patrones de interacción, consistente con el análisis de importancia relativa de variables.
+
+La Figura 2 muestra los 10 KPIs con mayor contribución a la predicción del éxito académico
+
+![Figura 2. KPIs que inciden en la predicción del éxito académico](F2_top10kpi.jpeg)
+
+El análisis de importancia relativa mediante el método de garzón permite identificar 10 KPIs con mayor contribución a la predicción del éxito académico. las variables con mayor peso correspondieron a “resource” y “externalquiz”, seguidas por “page” y “quiz”, Lo que sugiere que el consumo de materiales y la participación en actividades evaluativas e interactivas constituyen señales altamente informativas para anticipar la aprobación. en un segundo nivel se ubicaron “glossary” y “url”, asociadas a una consulta de apoyo y navegación hace recursos enlazados, mientras que “questionnaire”, “oucontent”, “homepage” y “htmlactivity” Completaron el top 10 reflejando patrones de acceso y uso de contenido de la asignatura. estas importancias deben interpretarse como relevancia predictiva dentro del modelo entrenado y no como evidencia causal.
+
+## Discusión final y conclusiones
+
+El modelo de la red neuronal artificial entrenado con trazas de interacción provenientes de un LMS durante los primeros 90 días mostró un desempeño moderado para predecir el éxito académico relacionado con la aprobación de la asignatura. con un Accuracy ≈ 0.70 y Balanced Accuracy ≈ 0.69, el sistema mejora de forma clara. Esto sugiere que el comportamiento de navegación y consumo de recursos digitales contiene información suficiente para anticipar, con antelación razonable, si un estudiante aprobará la asignatura.
+
+Un hallazgo relevante es el desequilibrio entre la sensibilidad y la especificidad. La sensibilidad (≈ 0.78) indica que el modelo identifica bien a quiénes sí aprueban, pero la especificidad (≈ 0.61) es menor, evidenciando dificultades para reconocer a quienes no aprueban. Esto implica que el modelo tiende a ser optimista porque comete más errores al pronosticar la aprobación de un estudiante que finalmente no aprueba representando un porcentaje importante en falsos positivos. Esto tiene implicaciones para el uso institucional Aunque el modelo es más confiable para perfilar patrones asociados al éxito académico, pero si se pretende usarlo como un sistema de alerta para “no aprobados” habría que ajustar umbrales para reducir falsos positivos.
+
+La interpretación del modelo mediante importancia relativa (Garzon) complementó la evaluación predictiva. Los KPI más influyentes se asociaron principalmente a consumos de recursos y actividades evaluativas e interactivas, destacando resource y externalquiz, seguidos por page y quiz. Esto sugiere que el éxito académico está fuertemente relacionado con la exposición sostenida a materiales de la asignatura Y la participación en actividades que suelen demandar práctica, evaluación o autoevaluación. Variables glossary, url y questionnaire aporta un componente de consulta y profundización, consistente con estudiantes que exploran apoyos y materiales complementarios. En conjunto, el patrón respalda la idea de que no basta solo ingresar a la asignatura en la plataforma sino que el éxito parece vincularse con interacciones más enriquecidas como el estudio de recursos, participación en evaluaciones y navegación consistente en los diferentes recursos educativos del LMS.
+
+### Conclusiones
+
+Respecto a la viabilidad predictiva con datos de interacción es posible predecir el éxito académico referido a la aprobación de la asignatura usando exclusivamente registros de interacción con recursos digitales del LMS, Alcanzando un desempeño superior al azar y al clasificador por clase mayoritaria.
+
+El modelo presentó una mayor capacidad para identificar estudiantes que aprueban, Que para reconocer a quiénes no aprueban, Mostrando una tendencia a predicciones optimistas lo que genera falsos positivos. para un uso como alerta temprana será necesario ajustar el umbral de decisión y estrategias de balance.
+
+El análisis de importancia relativa Indicó que las variables con mayor contribución a la predicción se relacionan con el consumo de recursos y la participación en evaluaciones y actividades que generan interacción como los quiz o páginas.
+
+Los resultados permitieron orientar acciones de mejora para priorizar el diseño y seguimiento de recursos claves, promover actividades evaluativas formativas tempranas y monitorear patrones de interacción como indicadores operativos del proceso de aprendizaje.
+
+## Referencias bibliográficas
+
+Azizi, H., Amini, M. S., Sulaimany, S., & Mafakheri, A. (2025). Visibility graph analysis for educational data: Potentials and a case study of predicting at-risk online students. Scientific Reports.
+
+Ben Said, A., Abdel-Salam, A.-S. G., & Hazaa, K. A. (2024). Performance prediction in online academic course: A deep learning approach with time series imaging. Multimedia Tools and Applications, 83, 55427–55445. <https://doi.org/10.1007/s11042-023-17596-9>
+
+Dias, S. B., Hadjileontiadou, S. J., Diniz, J., & Hadjileontiadis, L. J. (2020). DeepLMS: A deep learning predictive model for supporting online learning in the Covid‑19 era. Scientific Reports, 10, Artículo 19888. <https://doi.org/10.1038/s41598-020-76740-9>
+
+Evangelista, E. D. L., & Sy, B. D. (2022). An approach for improved students’ performance prediction using homogeneous and heterogeneous ensemble methods. International Journal of Electrical and Computer Engineering (IJECE), 12(5), 5226–5235. <https://doi.org/10.11591/ijece.v12i5.pp5226-5235>
+
+Fazil, M., & Albahlal, B. M. (2025). MultiFAR: Multidimensional information fusion with attention-driven representation learning for student performance prediction. PLOS ONE, 20(10), e0333099. <https://doi.org/10.1371/journal.pone.0333099>
+
+Fazil, M., Rísquez, A., & Halpin, C. (2024). A novel deep learning model for student performance prediction using engagement data. Journal of Learning Analytics, 11(2), 23–41. <https://doi.org/10.18608/jla.2024.7985>
+
+He, Y., Chen, R., Li, X., Hao, C., Liu, S., Zhang, G., & Jiang, B. (2020). Online at-risk student identification using RNN-GRU joint neural networks. Information, 11(10), 474. <https://doi.org/10.3390/info11100474>
+
+Huang, Q., & Chen, J. (2024). Enhancing academic performance prediction with temporal graph networks for massive open online courses. Journal of Big Data, 11, Artículo 52. <https://doi.org/10.1186/s40537-024-00918-5>
+
+Huang, Q., & Zeng, Y. (2024). Improving academic performance predictions with dual graph neural networks. Complex & Intelligent Systems, 10, 3557–3575. <https://doi.org/10.1007/s40747-024-01344-z>
+
+Junejo, N. U. R., Huang, Q., Dong, X., Wang, C., Zeb, A., Humayoo, M., & Zheng, G. (2024). SAPPNet: Students’ academic performance prediction during COVID-19 using neural network. Scientific Reports, 14, Artículo 24605. <https://doi.org/10.1038/s41598-024-75242-2>
+
+Junejo, N. U. R., Nawaz, M. W., Huang, Q., Dong, X., Wang, C., & Zheng, G. (2025). Accurate multi-category student performance forecasting at early stages of online education using neural networks. Scientific Reports, 15(1), Artículo 16251. <https://doi.org/10.1038/s41598-025-00256-3>
+
+Kalita, E., El Aouifi, H., Kukkar, A., Hussain, S., Ali, T., & Gaftandzhieva, S. (2025). LSTM-SHAP based academic performance prediction for disabled learners in virtual learning environments: A statistical analysis approach. Social Network Analysis and Mining, 15, Artículo 65. <https://doi.org/10.1007/s13278-025-01484-1>
+
+Liu, Y., Fan, S., Xu, S., Sajjanhar, A., Yeom, S., & Wei, Y. (2023). Predicting student performance using clickstream data and machine learning. Education Sciences, 13(1), 17. <https://doi.org/10.3390/educsci13010017>
+
+Mutawa, A. M., & Sruthi, S. (2024). Enhancing human–computer interaction in online education: A machine learning approach to predicting student emotion and satisfaction. International Journal of Human–Computer Interaction, 40(24), 8827–8843. <https://doi.org/10.1080/10447318.2023.2291611>
+
+Ramaraj, M., Dhendapani, S., Chembath, J., Srividhya, S., Thangarasu, N., & Ilango, B. (2025). Educational data mining approach for predicting student performance and behavior using deep learning techniques. IAES International Journal of Artificial Intelligence (IJ-AI), 14(5), 4113–4122. <https://doi.org/10.11591/ijai.v14.i5.pp4113-4122>
+
+Yang, Y., Zhao, S., An, S., Li, X., & Zhang, Y. (2025). Student academic performance prediction via hypergraph and TabNet. Journal of Big Data, 12, Artículo 119. <https://doi.org/10.1186/s40537-025-01170-1>
+
+## Procesamiento de datos
+
+```{r}
+if (!requireNamespace("data.table", quietly = TRUE)) install.packages("data.table")
+library(data.table)
+
+# Crea la carpeta oulad, descarga y descomprime
+if (!file.exists("oulad/studentVle.csv")) {
+  zip_url <- "https://archive.ics.uci.edu/static/public/349/open%2Buniversity%2Blearning%2Banalytics%2Bdataset.zip"
+  download.file(zip_url, "oulad.zip", mode = "wb")
+  unzip("oulad.zip", exdir = "oulad")
+}
+
+# Cargar tablas (AQUÍ se crea svle)
+svle <- fread("oulad/studentVle.csv")
+info <- fread("oulad/studentInfo.csv")
+vle  <- fread("oulad/vle.csv")
+
+# Filtrar primeros 90 días
+svle_90 <- svle[date >= 0 & date <= 89]
+
+# Unir activity_type
+svle_90 <- merge(
+  svle_90,
+  vle[, .(code_module, code_presentation, id_site, activity_type)],
+  by = c("code_module","code_presentation","id_site"),
+  all.x = TRUE
+)
+
+# Features: clicks por estudiante y tipo de actividad
+feat <- svle_90[, .(clicks = sum(sum_click, na.rm = TRUE)),
+                by = .(code_module, code_presentation, id_student, activity_type)]
+
+feat_w <- dcast(
+  feat,
+  code_module + code_presentation + id_student ~ activity_type,
+  value.var = "clicks",
+  fill = 0
+)
+
+# Label + merge final
+y <- info[, .(code_module, code_presentation, id_student, final_result)]
+ds <- merge(y, feat_w, by = c("code_module","code_presentation","id_student"))
+
+ds[, target := fifelse(final_result %in% c("Pass","Distinction"), 1L, 0L)]
+ds[, final_result := NULL]
+
+fwrite(ds, "oulad_nn_dataset_first90days.csv")
+
+# Verificación
+ds2 <- fread("oulad_nn_dataset_first90days.csv")
+dim(ds2)
+table(ds2$target)
+
+```
+
+### Explorando el dataset
+
+```{r}
+library(data.table)
+
+# ya lo tienes:
+# ds2 <- fread("oulad_nn_dataset_first90days.csv")
+
+str(ds2)
+summary(ds2$target)
+table(ds2$target)
+
+# % de cada clase
+prop.table(table(ds2$target))
+
+```
+
+### Visualizando la tabla
+
+```{r}
+ds2
+```
+
+### Primer gráfico
+
+```{r}
+plot(ds2)
+```
+
+### Limpiando los datos
+
+```{r}
+library(dplyr)
+
+# Columnas que NO deben ir como X
+id_cols <- intersect(names(ds2), c("code_module","code_presentation","id_student"))
+x_cols <- setdiff(names(ds2), c(id_cols, "target"))
+
+# Asegurar que X sea numérico
+# (si alguna quedó como character, la convertimos)
+ds2[, (x_cols) := lapply(.SD, as.numeric), .SDcols = x_cols]
+
+# Eliminar NA por seguridad
+ds2 <- na.omit(ds2)
+
+# Check final
+stopifnot(all(sapply(ds2[, ..x_cols], is.numeric)))
+
+```
+
+### Train/Test estratificado
+
+```{r}
+library(caret)
+
+set.seed(123)
+
+y <- factor(ds2$target, levels = c(0,1))
+train_idx <- createDataPartition(y, p = 0.80, list = FALSE)
+
+train <- ds2[train_idx]
+test  <- ds2[-train_idx]
+
+train_y <- factor(train$target, levels=c(0,1))
+test_y  <- factor(test$target, levels=c(0,1))
+
+train_x <- as.data.frame(train[, ..x_cols])
+test_x  <- as.data.frame(test[, ..x_cols])
+
+prop.table(table(train_y))
+prop.table(table(test_y))
+
+```
+
+### Normalización de datos
+
+```{r}
+minmax_fit <- function(df) {
+  mins <- sapply(df, min, na.rm = TRUE)
+  maxs <- sapply(df, max, na.rm = TRUE)
+  list(mins = mins, maxs = maxs)
+}
+
+minmax_transform <- function(df, fit) {
+  mins <- fit$mins
+  maxs <- fit$maxs
+  # evitar división por cero si alguna columna es constante
+  denom <- ifelse((maxs - mins) == 0, 1, (maxs - mins))
+  as.data.frame(Map(function(x, mn, dm) (x - mn)/dm, df, mins, denom))
+}
+
+fit <- minmax_fit(train_x)
+train_xn <- minmax_transform(train_x, fit)
+test_xn  <- minmax_transform(test_x, fit)
+
+```
+
+### Entrenando la red neuronal con NNET
+
+```{r}
+library(nnet)
+
+set.seed(123)
+
+# One-hot para y
+train_y_oh <- class.ind(train_y)
+
+nn <- nnet(
+  x = as.matrix(train_xn),
+  y = train_y_oh,
+  size = 10,       # neuronas en capa oculta (ajustable)
+  decay = 1e-4,    # regularización (ajustable)
+  maxit = 300,
+  softmax = TRUE,
+  trace = FALSE
+)
+
+nn
+
+```
+
+### Evalución de la matriz de confusión y las métricas
+
+```{r}
+# Probabilidades
+probs <- predict(nn, as.matrix(test_xn), type = "raw")
+
+# prob de clase 1
+p1 <- probs[, "1"]
+
+# umbral (0.5 por defecto)
+pred <- factor(ifelse(p1 >= 0.5, 1, 0), levels = c(0,1))
+
+confusionMatrix(pred, test_y, positive = "1")
+
+```
+
+#### El modelo es muy optimista por ello voy a ajustar el umbral a 0,6 para que el modelo sea menos optimista, esto me esta generando que el modelo me de más aprobados de los que en realidad aprobaron.
+
+```{r}
+install.packages("caret")   # solo la primera vez
+library(caret)
+
+```
+
+### Mejorando el modelo
+
+```{r}
+library(caret)
+
+thresholds <- seq(0.3, 0.8, by = 0.05)
+
+out <- lapply(thresholds, function(t){
+  pred_t <- factor(ifelse(p1 >= t, 1, 0), levels = c(0,1))
+  cm <- confusionMatrix(pred_t, test_y, positive = "1")
+  data.frame(
+    threshold = t,
+    Accuracy = as.numeric(cm$overall["Accuracy"]),
+    Sensitivity = as.numeric(cm$byClass["Sensitivity"]),
+    Specificity = as.numeric(cm$byClass["Specificity"]),
+    Precision = as.numeric(cm$byClass["Pos Pred Value"]),
+    BalancedAcc = as.numeric(cm$byClass["Balanced Accuracy"])
+  )
+})
+
+out <- do.call(rbind, out)
+out[order(-out$BalancedAcc), ][1:8, ]
+
+```
+
+```{r}
+library(nnet)
+set.seed(123)
+
+grid <- expand.grid(size = c(5, 10, 15),
+                    decay = c(0, 1e-4, 1e-3))
+
+results <- lapply(1:nrow(grid), function(i){
+  s <- grid$size[i]; d <- grid$decay[i]
+  m <- nnet(as.matrix(train_xn), class.ind(train_y),
+            size = s, decay = d, maxit = 400,
+            softmax = TRUE, trace = FALSE)
+  pr <- predict(m, as.matrix(test_xn), type="raw")[,"1"]
+  pred <- factor(ifelse(pr >= 0.5, 1, 0), levels=c(0,1))
+  cm <- confusionMatrix(pred, test_y, positive="1")
+  data.frame(size=s, decay=d,
+             Accuracy=as.numeric(cm$overall["Accuracy"]),
+             BalancedAcc=as.numeric(cm$byClass["Balanced Accuracy"]),
+             Sensitivity=as.numeric(cm$byClass["Sensitivity"]),
+             Specificity=as.numeric(cm$byClass["Specificity"]))
+})
+
+res <- do.call(rbind, results)
+res[order(-res$BalancedAcc), ][1:10, ]
+
+```
+
+```{r}
+res <- res[complete.cases(res), ]
+res
+
+```
+
+```{r}
+library(nnet)
+library(caret)
+
+set.seed(123)
+
+nn_final <- nnet(
+  x = as.matrix(train_xn),
+  y = class.ind(train_y),
+  size = 15,
+  decay = 0,
+  maxit = 400,
+  softmax = TRUE,
+  trace = FALSE
+)
+
+probs <- predict(nn_final, as.matrix(test_xn), type="raw")
+p1 <- probs[, "1"]
+pred <- factor(ifelse(p1 >= 0.5, 1, 0), levels=c(0,1))
+
+confusionMatrix(pred, test_y, positive="1")
+
+```
+
+```{r plotnet-ok, fig.width=16, fig.height=8, message=FALSE, warning=FALSE}
+library(NeuralNetTools)
+plotnet(nn_final)
+
+```
+
+### Generando el ploteo de la red neuronal con Plotnet saca
+
+```{r}
+plotnet(nn_final, rep = "best")
+```
+
+```{r plotnet-big, fig.width=16, fig.height=8, message=FALSE, warning=FALSE}
+library(NeuralNetTools)
+plotnet(nn_final)
+```
+
+```{r}
+install.packages("NeuralNetTools")  # si no lo tienes
+library(NeuralNetTools)
+g <- garson(nn_final)   # calcula importancia relativa
+plot(g)                 # grafica (proporcional)
+```
+
+```{r}
+g <- garson(nn_final, bar_plot = FALSE)
+
+# g suele traer un data frame con importancias
+imp <- g$rel_imp
+imp <- imp[order(-imp$rel_imp), ]
+head(imp, 10)   # Top 10 KPIs
+
+```
+
+```{r}
+library(nnet)
+
+set.seed(123)
+
+# y numérica 0/1 (1 = aprueba)
+train_y_num <- as.numeric(as.character(train_y))  # si train_y es factor "0","1"
+# Si te da NA, usa: train_y_num <- ifelse(train_y == "1", 1, 0)
+
+nn_1out <- nnet(
+  x = as.matrix(train_xn),
+  y = train_y_num,
+  size = 15,
+  decay = 0,
+  maxit = 400,
+  entropy = TRUE,   # clasificación binaria con 1 salida
+  trace = FALSE
+)
+
+# Probabilidad de aprobar (clase 1)
+p1 <- predict(nn_1out, as.matrix(test_xn), type = "raw")
+pred <- factor(ifelse(p1 >= 0.5, 1, 0), levels = c(0,1))
+
+library(caret)
+confusionMatrix(pred, test_y, positive = "1")
+
+```
+
+```{r, fig.width=14, fig.height=6}
+install.packages("NeuralNetTools")  # si no lo tienes
+library(NeuralNetTools)
+
+plot(garson(nn_1out))
+
+```
+
+### TOP 10 KPI
+
+```{r kpi-top10-hist-fix, fig.width=10, fig.height=5, message=FALSE, warning=FALSE}
+library(NeuralNetTools)
+library(ggplot2)
+library(dplyr)
+
+g <- garson(nn_1out, bar_plot = FALSE)
+rel <- as.numeric(g$rel_imp)
+
+# 1) Obtener nombres de variables desde tus X (usa el que tengas disponible)
+# Prioridad: colnames(train_xn) -> x_cols -> colnames(ds2)
+var_names <- NULL
+if (exists("train_xn")) var_names <- colnames(train_xn)
+if (is.null(var_names) && exists("x_cols")) var_names <- x_cols
+if (is.null(var_names) && exists("ds2")) var_names <- setdiff(names(ds2), c("target","code_module","code_presentation","id_student"))
+
+# 2) Chequeo de consistencia (deben coincidir longitudes)
+stopifnot(length(rel) == length(var_names))
+
+# 3) Armar dataframe + Top 10
+imp <- data.frame(var = var_names, rel_imp = rel, row.names = NULL)
+
+imp_top10 <- imp %>%
+  arrange(desc(rel_imp)) %>%
+  slice_head(n = 10) %>%
+  arrange(rel_imp)
+
+imp_top10$var <- factor(imp_top10$var, levels = imp_top10$var)
+
+ggplot(imp_top10, aes(x = var, y = rel_imp)) +
+  geom_col(width = 0.8) +
+  labs(x = NULL, y = "Importancia (Garson)", title = "Top 10 KPI por importancia relativa") +
+  theme_minimal(base_size = 12) +
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+```
