@@ -121,7 +121,7 @@ Yang, Y., Zhao, S., An, S., Li, X., & Zhang, Y. (2025). Student academic perform
 
 ## Procesamiento de datos
 
-```{r}
+####```{r}
 if (!requireNamespace("data.table", quietly = TRUE)) install.packages("data.table")
 library(data.table)
 
@@ -173,11 +173,11 @@ ds2 <- fread("oulad_nn_dataset_first90days.csv")
 dim(ds2)
 table(ds2$target)
 
-```
+
 
 ### Explorando el dataset
 
-```{r}
+####```{r}
 library(data.table)
 
 # ya lo tienes:
@@ -190,23 +190,23 @@ table(ds2$target)
 # % de cada clase
 prop.table(table(ds2$target))
 
-```
+
 
 ### Visualizando la tabla
 
-```{r}
+#### ```{r}
 ds2
-```
+
 
 ### Primer gráfico
 
-```{r}
+####```{r}
 plot(ds2)
-```
+####```
 
 ### Limpiando los datos
 
-```{r}
+####```{r}
 library(dplyr)
 
 # Columnas que NO deben ir como X
@@ -223,11 +223,11 @@ ds2 <- na.omit(ds2)
 # Check final
 stopifnot(all(sapply(ds2[, ..x_cols], is.numeric)))
 
-```
+####```
 
 ### Train/Test estratificado
 
-```{r}
+####```{r}
 library(caret)
 
 set.seed(123)
@@ -247,11 +247,11 @@ test_x  <- as.data.frame(test[, ..x_cols])
 prop.table(table(train_y))
 prop.table(table(test_y))
 
-```
+####```
 
 ### Normalización de datos
 
-```{r}
+####```{r}
 minmax_fit <- function(df) {
   mins <- sapply(df, min, na.rm = TRUE)
   maxs <- sapply(df, max, na.rm = TRUE)
@@ -270,11 +270,11 @@ fit <- minmax_fit(train_x)
 train_xn <- minmax_transform(train_x, fit)
 test_xn  <- minmax_transform(test_x, fit)
 
-```
+####```
 
 ### Entrenando la red neuronal con NNET
 
-```{r}
+####```{r}
 library(nnet)
 
 set.seed(123)
@@ -294,11 +294,11 @@ nn <- nnet(
 
 nn
 
-```
+####```
 
 ### Evalución de la matriz de confusión y las métricas
 
-```{r}
+####```{r}
 # Probabilidades
 probs <- predict(nn, as.matrix(test_xn), type = "raw")
 
@@ -310,19 +310,19 @@ pred <- factor(ifelse(p1 >= 0.5, 1, 0), levels = c(0,1))
 
 confusionMatrix(pred, test_y, positive = "1")
 
-```
+####```
 
 #### El modelo es muy optimista por ello voy a ajustar el umbral a 0,6 para que el modelo sea menos optimista, esto me esta generando que el modelo me de más aprobados de los que en realidad aprobaron.
 
-```{r}
+####```{r}
 install.packages("caret")   # solo la primera vez
 library(caret)
 
-```
+####```
 
 ### Mejorando el modelo
 
-```{r}
+####```{r}
 library(caret)
 
 thresholds <- seq(0.3, 0.8, by = 0.05)
@@ -343,9 +343,9 @@ out <- lapply(thresholds, function(t){
 out <- do.call(rbind, out)
 out[order(-out$BalancedAcc), ][1:8, ]
 
-```
+####```
 
-```{r}
+####```{r}
 library(nnet)
 set.seed(123)
 
@@ -370,15 +370,15 @@ results <- lapply(1:nrow(grid), function(i){
 res <- do.call(rbind, results)
 res[order(-res$BalancedAcc), ][1:10, ]
 
-```
+####```
 
-```{r}
+####```{r}
 res <- res[complete.cases(res), ]
 res
 
-```
+####```
 
-```{r}
+####```{r}
 library(nnet)
 library(caret)
 
@@ -400,33 +400,33 @@ pred <- factor(ifelse(p1 >= 0.5, 1, 0), levels=c(0,1))
 
 confusionMatrix(pred, test_y, positive="1")
 
-```
+####```
 
-```{r plotnet-ok, fig.width=16, fig.height=8, message=FALSE, warning=FALSE}
+####```{r plotnet-ok, fig.width=16, fig.height=8, message=FALSE, warning=FALSE}
 library(NeuralNetTools)
 plotnet(nn_final)
 
-```
+####```
 
 ### Generando el ploteo de la red neuronal con Plotnet saca
 
-```{r}
+####```{r}
 plotnet(nn_final, rep = "best")
-```
+####```
 
-```{r plotnet-big, fig.width=16, fig.height=8, message=FALSE, warning=FALSE}
+####```{r plotnet-big, fig.width=16, fig.height=8, message=FALSE, warning=FALSE}
 library(NeuralNetTools)
 plotnet(nn_final)
-```
+####```
 
-```{r}
+####```{r}
 install.packages("NeuralNetTools")  # si no lo tienes
 library(NeuralNetTools)
 g <- garson(nn_final)   # calcula importancia relativa
 plot(g)                 # grafica (proporcional)
-```
+####```
 
-```{r}
+####```{r}
 g <- garson(nn_final, bar_plot = FALSE)
 
 # g suele traer un data frame con importancias
@@ -434,9 +434,9 @@ imp <- g$rel_imp
 imp <- imp[order(-imp$rel_imp), ]
 head(imp, 10)   # Top 10 KPIs
 
-```
+####```
 
-```{r}
+####```{r}
 library(nnet)
 
 set.seed(123)
@@ -462,19 +462,19 @@ pred <- factor(ifelse(p1 >= 0.5, 1, 0), levels = c(0,1))
 library(caret)
 confusionMatrix(pred, test_y, positive = "1")
 
-```
+####```
 
-```{r, fig.width=14, fig.height=6}
+####```{r, fig.width=14, fig.height=6}
 install.packages("NeuralNetTools")  # si no lo tienes
 library(NeuralNetTools)
 
 plot(garson(nn_1out))
 
-```
+####```
 
 ### TOP 10 KPI
 
-```{r kpi-top10-hist-fix, fig.width=10, fig.height=5, message=FALSE, warning=FALSE}
+####```{r kpi-top10-hist-fix, fig.width=10, fig.height=5, message=FALSE, warning=FALSE}
 library(NeuralNetTools)
 library(ggplot2)
 library(dplyr)
@@ -507,4 +507,4 @@ ggplot(imp_top10, aes(x = var, y = rel_imp)) +
   labs(x = NULL, y = "Importancia (Garson)", title = "Top 10 KPI por importancia relativa") +
   theme_minimal(base_size = 12) +
   theme(axis.text.x = element_text(angle = 30, hjust = 1))
-```
+####```
